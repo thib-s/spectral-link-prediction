@@ -3,18 +3,19 @@ import regression.functions as funcs
 import numpy as np
 
 
-def fit(sigmaA: np.array, sigmaB: np.array, functionType):
+def fit(sigmaA: np.array, sigmaB: np.array, functionType, verbose=False):
     """
     perform the 1D regression between the eigenvalues of A and the eigenvalues of B
     :param sigmaA: array of the eig val of A
     :param sigmaB: idem for B
     :param functionType: the type of the function to use, see functions.py to see available functions
-    :return: the optimal param for F such that for all i: f(A[i]) =~= B[i]
+    :return: the fitted function F such that for all i: f(A[i]) =~= B[i]
     """
     sigmaA.sort()
     sigmaB.sort()
     loss_func = lambda alpha: function_loss(functionType, sigmaB, sigmaA, alpha)
-    return opt.minimize(fun=loss_func, x0=np.array([0.]), bounds=np.array([(0., 1.)]))
+    res = opt.minimize(fun=loss_func, x0=np.array([0.]), bounds=np.array([(0., 1.)]))
+    return lambda sigmaA: functionType(res.x[0], sigmaA)
 
 
 def function_loss(function, sigmaB, sigmaA, alpha):
@@ -33,5 +34,6 @@ def function_loss(function, sigmaB, sigmaA, alpha):
 if __name__ == '__main__':
     sigmaA = np.array([1., 2., 6., 4., 5., 5.5, 7.])
     sigmaB = funcs.exponential(0.5, sigmaA)
-    res = fit(sigmaA, sigmaB, funcs.exponential)
-    print(res)
+    F = fit(sigmaA, sigmaB, funcs.exponential)
+    print(F(sigmaA))
+    print(sigmaB)
