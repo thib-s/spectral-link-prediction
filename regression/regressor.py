@@ -1,5 +1,5 @@
 from scipy import optimize as opt
-import regression.functions as func
+import regression.functions as funcs
 import numpy as np
 
 
@@ -11,6 +11,8 @@ def fit(sigmaA: np.array, sigmaB: np.array, functionType):
     :param functionType: the type of the function to use, see functions.py to see available functions
     :return: a function such that for all i: f(A[i]) =~= B[i]
     """
+    sigmaA = sigmaA.sort()
+    sigmaB = sigmaB.sort()
     loss_func = lambda alpha: function_loss(functionType, sigmaB, sigmaA, alpha)
     return opt.minimize(fun=loss_func, x0=np.array([0.]), bounds=np.array([(0., 1.)]))
 
@@ -30,6 +32,6 @@ def function_loss(function, sigmaB, sigmaA, alpha):
 
 if __name__ == '__main__':
     sigmaA = np.array([1., 2., 3., 4., 5., 6., 7.])
-    sigmaB = func.exponential(0.5, sigmaA)
-    res = fit(sigmaA, sigmaB, func.exponential)
+    sigmaB = funcs.exponential(0.5, sigmaA)
+    res = fit(sigmaA, sigmaB, funcs.exponential)
     print(res)
