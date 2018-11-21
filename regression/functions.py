@@ -7,10 +7,13 @@ def path_counting(alpha: np.array([float]), x: np.array([float])): return np.dot
 def exponential(alpha: float, x: np.array([float])): return np.exp(alpha * x)
 
 
+def exponential_odd(alpha: float, x: np.array([float])): return np.sinh(alpha * x)
+
+
 def von_neumann(alpha: float, x: np.array([float])): return 1 / (1 - alpha * x)
 
 
-def hyperbolic_sine(alpha: float, x: np.array([float])): return alpha * x / (1 - alpha**2 * x**2)
+def von_neumann_odd(alpha: float, x: np.array([float])): return alpha * x / (1 - alpha**2 * x**2)
 
 
 def COM(x: np.array([float])): return 1 / np.dot(x, x[x > 0])
