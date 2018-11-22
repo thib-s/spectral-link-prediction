@@ -1,3 +1,4 @@
+import pickle
 
 import networkx as nx
 import pandas as pd
@@ -33,6 +34,24 @@ def get_graphs_from_csv(filename):
         holding_graphs.append((date,create_graph_for_date(holding_graph,holdings_on_date)))
 
     return holding_graphs
+
+def save_graphs_to_pickle(graphs,pickle_filename):
+    """
+    Pickles the list of graphs.
+
+    Parameters
+    ----------
+    graphs : list(tuple(date,networkx graph))
+
+        A list of weighted bipartite graphs - one for each distinct date, along with the date.
+    pickle_filename : string
+        Output file path
+    """
+
+    outfile = open(pickle_filename,'wb')
+    pickle.dump(graphs,outfile)
+    outfile.close()
+
 def create_graph_for_date(graph,holdings):
     """Adds edges to the graph corresponding to holdings on that particular day
 
@@ -77,10 +96,7 @@ def create_edgeless_graph(fund_numbers,stocks):
     graph.add_nodes_from(fund_numbers)
     return graph
 def main():
-    graphs = get_graphs_from_csv('test.csv')
-    for graph in graphs:
-        print ('date',graph[0])
-        print ('nodes:',graph[1].nodes)
-        print ('edges:',graph[1].edges)
+    graphs = get_graphs_from_csv('ds1.csv')
+    save_graphs_to_pickle(graphs, 'dataset1')
 if __name__ == '__main__':
     main()
