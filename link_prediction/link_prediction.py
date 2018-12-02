@@ -5,6 +5,7 @@ from scipy.sparse import csc_matrix, csr_matrix, diags
 from regression.regressor import fit
 import matplotlib.pyplot as plt
 
+
 def fit_link_prediction_function(graphA: nx.Graph, graphB: nx.Graph, function, k, verbose=False):
     """
     compute the spectral function that transforms the graphA into the graphB
@@ -15,18 +16,23 @@ def fit_link_prediction_function(graphA: nx.Graph, graphB: nx.Graph, function, k
     :param verbose: if true plot the sigmaA and sigmaB
     :return: the function with the fitted parameters
     """
-    A = nx.laplacian_matrix(graphA).asfptype()
-    B = nx.laplacian_matrix(graphB).asfptype()
+    A = nx.adjacency_matrix(graphA).asfptype()
+    B = A - nx.adjacency_matrix(graphB).asfptype()
+    den = max(np.max(A), np.max(B))
+    # A = A / den
+    # B = B / den
     Ub, sigmaB, Vtb = svds(B, k, which='LM')
     Ua, sigmaA, Vta = svds(A, k, which='LM')
-    f = fit(sigmaA, sigmaB, function)
-    if verbose:
-        space = np.linspace(0.,2.)
-        fx = np.vectorize(f)(space)
-        plt.plot(sigmaB, sigmaA, 'rx')
-        plt.plot(fx, space, 'b--')
-        plt.show()
-    return f
+    coefs = np.polyfit(sigmaA, sigmaB,3)
+    f = np.vectorize(lambda x: np.sum([x ** (len(coefs)-i-1) * coefs[i] for i in range(len(coefs))]))
+    # f = fit(sigmaA, sigmaB, function)
+    space = np.linspace(min(sigmaA), max(sigmaA))
+    fx = np.vectorize(f)(space)
+    plt.plot(sigmaA, sigmaB, 'rx', label='eigen values')
+    plt.plot(space, fx, 'b--', label='best fit')
+    plt.ylabel('graph at t+1')
+    plt.xlabel('graph at t')
+    return f, coefs, plt
 
 
 def predict_links(graph: nx.Graph, f, k):
@@ -41,4 +47,4 @@ def predict_links(graph: nx.Graph, f, k):
     u, sigmaA, vt = svds(A, k, return_singular_vectors=True)
     sigmaB = f(sigmaA)
     B = csr_matrix(u) * diags(sigmaB) * csc_matrix(vt)
-    return nx.from_scipy_sparse_matrix(B)
+    return B
