@@ -6,7 +6,7 @@ from regression.regressor import fit
 import matplotlib.pyplot as plt
 
 
-def fit_link_prediction_function(graphA: nx.Graph, graphB: nx.Graph, function, k, verbose=False):
+def fit_link_prediction_function(graphA: nx.Graph, graphB: nx.Graph, function, k, verbose=False, ax=None):
     """
     compute the spectral function that transforms the graphA into the graphB
     :param graphA:
@@ -28,10 +28,10 @@ def fit_link_prediction_function(graphA: nx.Graph, graphB: nx.Graph, function, k
     # f = fit(sigmaA, sigmaB, function)
     space = np.linspace(min(sigmaA), max(sigmaA))
     fx = np.vectorize(f)(space)
-    plt.plot(sigmaA, sigmaB, 'rx', label='eigen values')
-    plt.plot(space, fx, 'b--', label='best fit')
-    plt.ylabel('graph at t+1')
-    plt.xlabel('graph at t')
+    if ax is None:
+        ax = plt
+    ax.plot(sigmaA, sigmaB, 'rx', label='eigen values')
+    ax.plot(space, fx, 'b--', label='best fit')
     return f, coefs, plt
 
 

@@ -3,6 +3,9 @@ import pickle
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+
+
 def get_graphs_from_csv(filename):
     """
     The main function of the file.
@@ -29,7 +32,6 @@ def get_graphs_from_csv(filename):
     holding_graphs = []
     for date in unique_dates:
         holding_graph = isolated_vertices.copy()
-        print (date)
         holdings_on_date = data[data['fdate']==date]
         holding_graphs.append((date,create_graph_for_date(holding_graph,holdings_on_date)))
 
@@ -68,7 +70,7 @@ def create_graph_for_date(graph,holdings):
         Holding graph for the given input data
     """
     edges = []
-    for index, row in holdings.iterrows():
+    for index, row in tqdm(holdings.iterrows()):
         edges.append((row['cusip'],row['fundno'],row['shares']))
 
     graph.add_weighted_edges_from(edges)
